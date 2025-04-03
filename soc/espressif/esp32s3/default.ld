@@ -409,6 +409,9 @@ SECTIONS
     *libzephyr.a:systimer_hal.*(.literal .text .literal.* .text.*)
     *libzephyr.a:spi_flash_hal_gpspi.*(.literal .text .literal.* .text.*)
 
+    *libzephyr.a:spi_flash_hal.*(.literal .literal.* .text .text.*)
+    *libzephyr.a:spi_flash_hal_common.*(.literal .literal.* .text .text.*)
+
     /* [mapping:soc] */
     *libzephyr.a:lldesc.*(.literal .literal.* .text .text.*)
 
@@ -650,6 +653,9 @@ SECTIONS
     *libzephyr.a:wdt_hal_iram.*(.rodata .rodata.*)
     *libzephyr.a:systimer_hal.*(.rodata .rodata.*)
     *libzephyr.a:spi_flash_hal_gpspi.*(.rodata .rodata.*)
+
+    *libzephyr.a:spi_flash_hal.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *libzephyr.a:spi_flash_hal_common.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
 
     /* [mapping:soc] */
     *libzephyr.a:lldesc.*(.rodata .rodata.*)
