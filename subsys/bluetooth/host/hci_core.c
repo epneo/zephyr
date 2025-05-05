@@ -121,7 +121,8 @@ static void rx_work_handler(struct k_work *work);
 static K_WORK_DEFINE(rx_work, rx_work_handler);
 #if defined(CONFIG_BT_RECV_WORKQ_BT)
 static struct k_work_q bt_workq;
-static K_KERNEL_STACK_DEFINE(rx_thread_stack, CONFIG_BT_RX_STACK_SIZE);
+static Z_KERNEL_STACK_DEFINE_IN(rx_thread_stack, CONFIG_BT_RX_STACK_SIZE,
+				__attribute__((section(".ext_ram.bss"))));
 #endif /* CONFIG_BT_RECV_WORKQ_BT */
 
 static void init_work(struct k_work *work);

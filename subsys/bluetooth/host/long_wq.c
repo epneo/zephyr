@@ -12,7 +12,8 @@
 #include <zephyr/kernel/thread_stack.h>
 #include <zephyr/sys_clock.h>
 
-K_THREAD_STACK_DEFINE(bt_lw_stack_area, CONFIG_BT_LONG_WQ_STACK_SIZE);
+Z_KERNEL_STACK_DEFINE_IN(bt_lw_stack_area, CONFIG_BT_LONG_WQ_STACK_SIZE,
+			 __attribute__((section(".ext_ram.bss"))));
 static struct k_work_q bt_long_wq;
 
 int bt_long_wq_schedule(struct k_work_delayable *dwork, k_timeout_t timeout)

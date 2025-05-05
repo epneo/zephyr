@@ -250,7 +250,8 @@ __net_socket struct tls_context {
 
 
 /* A global pool of TLS contexts. */
-static struct tls_context tls_contexts[CONFIG_NET_SOCKETS_TLS_MAX_CONTEXTS];
+static struct __attribute__((
+	section(".ext_ram.bss"))) tls_context tls_contexts[CONFIG_NET_SOCKETS_TLS_MAX_CONTEXTS];
 
 static struct tls_session_cache client_cache[CONFIG_NET_SOCKETS_TLS_MAX_CLIENT_SESSION_COUNT];
 
