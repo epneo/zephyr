@@ -36,7 +36,7 @@ LOG_MODULE_REGISTER(esp32_wifi, CONFIG_WIFI_LOG_LEVEL);
 /* use global iface pointer to support any ethernet driver */
 /* necessary for wifi callback functions */
 static struct net_if *esp32_wifi_iface;
-static struct esp32_wifi_runtime esp32_data;
+static __attribute__((section(".ext_ram.bss"))) struct esp32_wifi_runtime esp32_data;
 
 #if defined(CONFIG_ESP32_WIFI_AP_STA_MODE)
 static struct net_if *esp32_wifi_iface_ap;
