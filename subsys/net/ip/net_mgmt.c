@@ -42,7 +42,8 @@ struct mgmt_event_wait {
 static K_MUTEX_DEFINE(net_mgmt_callback_lock);
 
 #if defined(CONFIG_NET_MGMT_EVENT_THREAD)
-K_KERNEL_STACK_DEFINE(mgmt_stack, CONFIG_NET_MGMT_EVENT_STACK_SIZE);
+Z_KERNEL_STACK_DEFINE_IN(mgmt_stack, CONFIG_NET_MGMT_EVENT_STACK_SIZE,
+	__attribute__((section(".ext_ram.bss"))));
 
 static struct k_work_q mgmt_work_q_obj;
 #endif
