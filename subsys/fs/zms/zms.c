@@ -13,6 +13,7 @@
 #include <zephyr/sys/crc.h>
 #include "zms_priv.h"
 
+#ifdef CONFIG_SOC_ESP32S3_APPCPU
 #include <esp_flash.h>
 #include <esp_flash_encrypt.h>
 
@@ -21,6 +22,7 @@
 #else
 #define ENCRYPTION_IS_VIRTUAL 0
 #endif
+#endif /* CONFIG_SOC_ESP32S3_APPCPU */
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(fs_zms, CONFIG_ZMS_LOG_LEVEL);
@@ -262,7 +264,10 @@ static int zms_flash_block_cmp(struct zms_fs *fs, uint64_t addr, const void *dat
 	uint8_t buf[ZMS_BLOCK_SIZE];
 
 	int rc_raw;
+
+#ifdef CONFIG_SOC_ESP32S3_APPCPU
 	const static uint8_t ref_buf[ZMS_BLOCK_SIZE] = { 0xFF };
+#endif /* CONFIG_SOC_ESP32S3_APPCPU */
 
 	block_size = zms_round_down_write_block_size(fs, ZMS_BLOCK_SIZE);
 
@@ -273,7 +278,7 @@ static int zms_flash_block_cmp(struct zms_fs *fs, uint64_t addr, const void *dat
 		if (rc) {
 			return rc;
 		}
-
+#ifdef CONFIG_SOC_ESP32S3_APPCPU
 		if (esp_flash_encryption_enabled() && !ENCRYPTION_IS_VIRTUAL && !memcmp(data8, ref_buf, bytes_to_cmp)) {
 			uint8_t buf_raw[ZMS_BLOCK_SIZE];
 			int ret = esp_flash_read(NULL, &buf_raw, zms_addr_to_offset(fs, addr), sizeof(buf_raw));
@@ -283,6 +288,7 @@ static int zms_flash_block_cmp(struct zms_fs *fs, uint64_t addr, const void *dat
 			}
 			rc_raw = memcmp(data8, buf_raw, bytes_to_cmp);
 		}
+#endif /* CONFIG_SOC_ESP32S3_APPCPU */
 		rc = memcmp(data8, buf, bytes_to_cmp);
 		if (rc && rc_raw) {
 			return 1;
