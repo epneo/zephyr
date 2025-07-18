@@ -13,6 +13,15 @@
 #include <zephyr/sys/crc.h>
 #include "zms_priv.h"
 
+#include <esp_flash.h>
+#include <esp_flash_encrypt.h>
+
+#ifdef CONFIG_EFUSE_VIRTUAL_KEEP_IN_FLASH
+#define ENCRYPTION_IS_VIRTUAL (!efuse_hal_flash_encryption_enabled())
+#else
+#define ENCRYPTION_IS_VIRTUAL 0
+#endif
+
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(fs_zms, CONFIG_ZMS_LOG_LEVEL);
 
@@ -252,16 +261,30 @@ static int zms_flash_block_cmp(struct zms_fs *fs, uint64_t addr, const void *dat
 	size_t block_size;
 	uint8_t buf[ZMS_BLOCK_SIZE];
 
+	int rc_raw;
+	const static uint8_t ref_buf[ZMS_BLOCK_SIZE] = { 0xFF };
+
 	block_size = zms_round_down_write_block_size(fs, ZMS_BLOCK_SIZE);
 
 	while (len) {
 		bytes_to_cmp = MIN(block_size, len);
 		rc = zms_flash_rd(fs, addr, buf, bytes_to_cmp);
+		rc_raw = 1;
 		if (rc) {
 			return rc;
 		}
+
+		if (esp_flash_encryption_enabled() && !ENCRYPTION_IS_VIRTUAL && !memcmp(data8, ref_buf, bytes_to_cmp)) {
+			uint8_t buf_raw[ZMS_BLOCK_SIZE];
+			int ret = esp_flash_read(NULL, &buf_raw, zms_addr_to_offset(fs, addr), sizeof(buf_raw));
+			if (ret) {
+				LOG_ERR("esp_flash_read failed. %d", ret);
+				return 1;
+			}
+			rc_raw = memcmp(data8, buf_raw, bytes_to_cmp);
+		}
 		rc = memcmp(data8, buf, bytes_to_cmp);
-		if (rc) {
+		if (rc && rc_raw) {
 			return 1;
 		}
 		len -= bytes_to_cmp;
