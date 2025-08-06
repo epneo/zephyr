@@ -290,7 +290,7 @@ static bool aligned_flash_erase(const struct device *dev, size_t addr, size_t si
 	if (esp_flash_erase_region(NULL, aligned_addr, ALIGN_UP(bytes, FLASH_SECTOR_SIZE)) !=
 	    ESP_OK) {
 		LOG_ERR("%s: Flash erase failed", __func__);
-		return -1;
+		return false;
 	}
 
 	uint32_t bytes_written = bytes - addr_offset;
@@ -321,7 +321,7 @@ static bool aligned_flash_erase(const struct device *dev, size_t addr, size_t si
 		if (esp_flash_erase_region(NULL, aligned_addr + offset,
 					   ALIGN_UP(bytes, FLASH_SECTOR_SIZE)) != ESP_OK) {
 			LOG_ERR("%s: Flash erase failed", __func__);
-			return -1;
+			return false;
 		}
 
 		if (bytes < sizeof(write_data)) {
